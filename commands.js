@@ -31,7 +31,7 @@ var path = require('path'),
         })
     },
     sendLink = function(socket) {
-        var process = exec('sudo service motion restart', function(err, stdout, stederr) {
+        var process = exec('sudo service motion restart', function(err, stdout, stderr) {
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
             if(!err) {
