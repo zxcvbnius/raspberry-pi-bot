@@ -12,7 +12,7 @@ var path = require('path'),
     showVideoComds = ['show me the video'],
     sendPhoto = function(socket) {
 
-        var photoPath = '~/camera/' + moment().format('YYYY-MM-DD') + '.jpg'
+        var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
         var process = exec('fswebcam -p YUYV -d /dev/video0 -r 320x240 ' + photoPath, function(err, stdout, stderr) {
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
@@ -25,6 +25,7 @@ var path = require('path'),
                     'encoding': 'base64'
                 }, function(data) {
                     if(data.code !== 200) log(Errors.SEND_FAILED)
+ 	 	    log('sent successfully')
                 })
             }
         })
