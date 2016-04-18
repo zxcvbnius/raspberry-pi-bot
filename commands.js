@@ -17,7 +17,7 @@ var path = require('path'),
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
             if(!err) {
-                var base64 = Utils.toDataString(photoPath))
+                var base64 = Utils.toDataString(photoPath)
                 socket.emit('messages/create', {
                     'chatId': chatId,
                     'data': base64,
