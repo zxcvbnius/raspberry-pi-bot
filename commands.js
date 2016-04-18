@@ -1,6 +1,7 @@
 var path = require('path'),
     fs = require('fs'),
     exec = require('child_process').exec,
+    moment = require('moment'),
     config = require('./config'),
     chatId = config.chat.id,
     cameraUrl = config.camera.baseUrl,
@@ -11,12 +12,12 @@ var path = require('path'),
     showVideoComds = ['show me the video'],
     sendPhoto = function(socket) {
 
-        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 320x240 ~/camera/$(date +%Y%m%d_%H%M%S).jpg', function(err, stdout, stderr) {
+        var photoPath = '~/camera/' + moment().format() + '.jpg'
+        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 320x240 ' + path, function(err, stdout, stderr) {
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
             if(!err) {
-                var test = 'photo.png'
-                var base64 = Utils.toDataString(path.resolve(__dirname, test))
+                var base64 = Utils.toDataString(photoPath))
                 socket.emit('messages/create', {
                     'chatId': chatId,
                     'data': base64,
