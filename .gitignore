@@ -1,0 +1,15 @@
+# OS X
+.DS_Store*
+._*
+
+# Config
+config.js
+
+# Coveralls
+coverage
+
+# Benchmarking
+benchmarks/graphs
+
+# Auto Generated files
+docs/

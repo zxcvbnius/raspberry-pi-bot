@@ -1,0 +1,30 @@
+{
+  "name": "raspberry-pi-bot",
+  "version": "1.0.0",
+  "description": "Combination raspberry pi with Diuit API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zxcvbnius/raspberry-pi-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zxcvbnius/raspberry-pi-bot/issues"
+  },
+  "homepage": "https://github.com/zxcvbnius/raspberry-pi-bot#readme",
+  "devDependencies": {
+    "debug": "^2.2.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "fs": "0.0.2",
+    "lodash": "^4.11.0",
+    "path": "^0.12.7",
+    "request": "^2.71.0",
+    "socket.io-client": "^1.4.5"
+  }
+}
