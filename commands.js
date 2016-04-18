@@ -12,8 +12,8 @@ var path = require('path'),
     showVideoComds = ['show me the video'],
     sendPhoto = function(socket) {
 
-        var photoPath = '~/camera/' + moment().format() + '.jpg'
-        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 320x240 ' + path, function(err, stdout, stderr) {
+        var photoPath = '~/camera/' + moment().format('YYYY-MM-DD') + '.jpg'
+        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 320x240 ' + photoPath, function(err, stdout, stderr) {
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
             if(!err) {
