@@ -31,14 +31,20 @@ var path = require('path'),
         })
     },
     sendLink = function(socket) {
-        socket.emit('messages/create', {
-            'chatId': chatId,
-            'data': cameraUrl,
-            'mime': 'text/plain',
-            'encoding': 'utf8',
-            'meta': { 'type': 'stream' }
-        }, function(data) {
-            if(data.code !== 200) log(Errors.SEND_FAILED)
+        var process = exec('sudo service motion restart', function(err, stdout, stederr) {
+            log('stdout: ' + stdout)
+            log('stderr: ' + stderr)
+            if(!err) {
+                socket.emit('messages/create', {
+                    'chatId': chatId,
+                    'data': cameraUrl,
+                    'mime': 'text/plain',
+                    'encoding': 'utf8',
+                    'meta': { 'type': 'stream' }
+                }, function(data) {
+                    if(data.code !== 200) log(Errors.SEND_FAILED)
+                })
+            }
         })
     };
 
