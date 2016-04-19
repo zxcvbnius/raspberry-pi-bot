@@ -9,11 +9,11 @@ var path = require('path'),
     Errors = require('./lib/errors'),
     log = require('debug')(config.debug.tag + ':cmds'),
     takePhotoCmds = ['take a photo', 'take a picture'],
-    showVideoComds = ['show me the video'],
+    showVideoComds = ['play the video'],
     sendPhoto = function(socket) {
 
         var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
-        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 320x240 ' + photoPath, function(err, stdout, stderr) {
+        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 640x480 ' + photoPath, function(err, stdout, stderr) {
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
             if(!err) {
@@ -31,21 +31,20 @@ var path = require('path'),
         })
     },
     sendLink = function(socket) {
-        var process = exec('sudo service motion restart', function(err, stdout, stderr) {
+        var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
             log('stdout: ' + stdout)
             log('stderr: ' + stderr)
-            if(!err) {
-                socket.emit('messages/create', {
-                    'chatId': chatId,
-                    'data': cameraUrl,
-                    'mime': 'text/plain',
-                    'encoding': 'utf8',
-                    'meta': { 'type': 'stream' }
-                }, function(data) {
-                    if(data.code !== 200) log(Errors.SEND_FAILED)
-                })
-            }
-        })
+            if(!err) {}})
+            socket.emit('messages/create', {
+                'chatId': chatId,
+                'data': cameraUrl,
+                'mime': 'text/plain',
+                'encoding': 'utf8',
+                'meta': { 'type': 'stream' }
+            }, function(data) {
+                if(data.code !== 200) log(Errors.SEND_FAILED)
+ 	        log('sent successfully')
+            })
     };
 
 module.exports = {
