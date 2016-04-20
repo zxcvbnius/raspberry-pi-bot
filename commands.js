@@ -69,7 +69,7 @@ var path = require('path'),
             var data = 'No video is playing now, silly goose -_-'
             socket.emit('messages/create', {
                 'chatId': chatId,
-                'data': cameraUrl,
+                'data': data,
                 'mime': 'text/plain',
                 'encoding': 'utf8',
                 'meta': { 'type': 'stream' }
