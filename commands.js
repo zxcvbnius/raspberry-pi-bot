@@ -23,9 +23,8 @@ var path = require('path'),
                 'mime': 'text/plain',
                 'encoding': 'utf8'
             }, function(data) {
-                log(data)
                 if(data.code !== 200) {reject(Errors.SEND_FAILED); log(Errors.SEND_FAILED);}
-                else {resolve(); log('Sent successfully');}
+                else {resolve(); }
             })
         })
     },
@@ -47,13 +46,12 @@ var path = require('path'),
                     'encoding': 'base64'
                 }, function(data) {
                     if(data.code !== 200) log(Errors.SEND_FAILED)
- 	 	    log('sent successfully')
                 })
             }
         })
     },
     askTakingPhoto = function(socket) {
-        sendCommand('of course! wait a minute ~')
+        sendCommand(socket, 'of course! wait a minute ~')
         .then(function() {
             var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
             var process = exec('fswebcam -p YUYV -d /dev/video0 -r 640x480 ' + photoPath, function(err, stdout, stderr) {
@@ -68,7 +66,6 @@ var path = require('path'),
                         'encoding': 'base64'
                     }, function(data) {
                         if(data.code !== 200) log(Errors.SEND_FAILED)
-                        log('sent successfully')
                     })
                 }
             })
