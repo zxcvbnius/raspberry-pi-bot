@@ -15,7 +15,7 @@ var path = require('path'),
     stopPlayingCmds = ['stop', 'stop playing'],
     timeCmds = ['what time', 'time'],
     isPlaying = false,
-    sendCommand = function(text) {
+    sendCommand = function(socket, text) {
         return new Promise(function(resolve, reject) {
             socket.emit('messages/create', {
                 'chatId': chatId,
@@ -31,7 +31,7 @@ var path = require('path'),
     showTime = function(socket) {
         var data = 'Today is ' + moment().format('YYYY/MM/DD') + '.\n'
         + 'Now is ' + moment().format('hh:mm:ss') + '. It\'s time for launch~~'
-        sendCommand(data)
+        sendCommand(socket, data)
     },
     sendPhoto = function(socket) {
         var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
@@ -77,7 +77,7 @@ var path = require('path'),
     startPlaying = function(socket) {
         if(isPlaying) {
             var data = 'The video is playing, you can watch the video from ' + cameraUrl
-            sendCommand(data)
+            sendCommand(socket, data)
         }
         else {
             isPlaying = true
@@ -85,13 +85,13 @@ var path = require('path'),
                 log('stdout: ' + stdout);log('stderr: ' + stderr);
                 if(!err) { debug(err) }})
             var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop' //<(￣V￣)>
-            sendCommand(data)
+            sendCommand(socket, data)
         }
     },
     stopPlaying = function(socket) {
         if(!isPlaying) {
             var data = 'OhOh~\nNo video is playing now\nsilly goose -_-'
-            sendCommand(data)
+            sendCommand(socket, data)
         }
         else {
             isPlaying = false
@@ -99,7 +99,7 @@ var path = require('path'),
                 log('stdout: ' + stdout); log('stderr: ' + stderr);
                 if(!err) {}})
             var data = 'Ok! Already stopped playing the video\n<(￣O￣)>'
-            sendCommand(data)
+            sendCommand(socket, data)
         }
     };
 
