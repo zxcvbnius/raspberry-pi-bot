@@ -23,8 +23,9 @@ var path = require('path'),
                 'mime': 'text/plain',
                 'encoding': 'utf8'
             }, function(data) {
+                log(data)
                 if(data.code !== 200) {reject(Errors.SEND_FAILED); log(Errors.SEND_FAILED);}
-                else resolve()
+                else {resolve(); log('Sent successfully');}
             })
         })
     },
@@ -67,7 +68,7 @@ var path = require('path'),
                         'encoding': 'base64'
                     }, function(data) {
                         if(data.code !== 200) log(Errors.SEND_FAILED)
-                log('sent successfully')
+                        log('sent successfully')
                     })
                 }
             })
@@ -83,7 +84,7 @@ var path = require('path'),
             isPlaying = true
             var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
                 log('stdout: ' + stdout);log('stderr: ' + stderr);
-                if(!err) { debug(err) }})
+                if(err) { log(err) }})
             var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop' //<(￣V￣)>
             sendCommand(socket, data)
         }
