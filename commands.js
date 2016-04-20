@@ -54,7 +54,7 @@ var path = require('path'),
             var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '. If you want to stop the video, just typing \'stop playing\' <(￣V￣)>'
             socket.emit('messages/create', {
                 'chatId': chatId,
-                'data': cameraUrl,
+                'data': data,
                 'mime': 'text/plain',
                 'encoding': 'utf8',
                 'meta': { 'type': 'stream' }
