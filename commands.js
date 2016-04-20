@@ -10,6 +10,7 @@ var path = require('path'),
     log = require('debug')(config.debug.tag + ':cmds'),
     takePhotoCmds = ['take a photo', 'take a picture'],
     showVideoComds = ['play the video'],
+    isPlaying = false,
     sendPhoto = function(socket) {
 
         var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
@@ -30,11 +31,59 @@ var path = require('path'),
             }
         })
     },
-    sendLink = function(socket) {
-        var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
-            log('stdout: ' + stdout)
-            log('stderr: ' + stderr)
-            if(!err) {}})
+    startPlaying = function(socket) {
+        if(isPlaying) {
+            var data = 'The video is playing, you can watch the video from ' + cameraUrl
+            socket.emit('messages/create', {
+                'chatId': chatId,
+                'data': cameraUrl,
+                'mime': 'text/plain',
+                'encoding': 'utf8',
+                'meta': { 'type': 'stream' }
+            }, function(data) {
+                if(data.code !== 200) log(Errors.SEND_FAILED)
+                log('sent successfully')
+            })
+        }
+        else {
+            isPlaying = true
+            var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
+                log('stdout: ' + stdout);log('stderr: ' + stderr);
+                if(!err) { debug(err) }})
+            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '. If you want to stop the video, just typing \'stop\' <(￣V￣)>'
+            socket.emit('messages/create', {
+                'chatId': chatId,
+                'data': cameraUrl,
+                'mime': 'text/plain',
+                'encoding': 'utf8',
+                'meta': { 'type': 'stream' }
+            }, function(data) {
+                if(data.code !== 200) log(Errors.SEND_FAILED)
+                log('sent successfully')
+            })
+        }
+    },
+    stopPlaying = function(socket) {
+        if(!isPlaying) {
+            var data = 'No video is playing now, silly goose -_-'
+            socket.emit('messages/create', {
+                'chatId': chatId,
+                'data': cameraUrl,
+                'mime': 'text/plain',
+                'encoding': 'utf8',
+                'meta': { 'type': 'stream' }
+            }, function(data) {
+                if(data.code !== 200) log(Errors.SEND_FAILED)
+                log('sent successfully')
+            })
+        }
+        else {
+            isPlaying = false
+            var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {
+                log('stdout: ' + stdout)
+                log('stderr: ' + stderr)
+                if(!err) {}})
+            var data = 'Ok, already stopped playing the video <(￣O￣)>'
             socket.emit('messages/create', {
                 'chatId': chatId,
                 'data': cameraUrl,
@@ -45,20 +94,23 @@ var path = require('path'),
                 if(data.code !== 200) log(Errors.SEND_FAILED)
  	        log('sent successfully')
             })
+        }
     };
 
 module.exports = {
     get: function(str) {
+        str = str.toLowerCase()
         for(var i = 0 , len = takePhotoCmds.length; i < len; i++) {
             if(str.indexOf(takePhotoCmds[i]) > -1) return {
-                'command': takePhotoCmds[i],
+                'text': takePhotoCmds[i],
                 'action': sendPhoto
             }
         }
         for(var i = 0 , len = showVideoComds.length; i < len; i++) {
+            str = str.toLowerCase()
             if(str.indexOf(showVideoComds[i]) > -1) return {
-                'command': showVideoComds[i],
-                'action': sendLink
+                'text': showVideoComds[i],
+                'action': startPlaying
             }
         }
         return null
