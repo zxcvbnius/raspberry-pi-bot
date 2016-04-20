@@ -37,7 +37,7 @@ var path = require('path'),
             var data = 'The video is playing, you can watch the video from ' + cameraUrl
             socket.emit('messages/create', {
                 'chatId': chatId,
-                'data': cameraUrl,
+                'data': data,
                 'mime': 'text/plain',
                 'encoding': 'utf8',
                 'meta': { 'type': 'stream' }
@@ -51,7 +51,7 @@ var path = require('path'),
             var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
                 log('stdout: ' + stdout);log('stderr: ' + stderr);
                 if(!err) { debug(err) }})
-            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '. If you want to stop the video, just typing \'stop playing\' <(￣V￣)>'
+            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop' //<(￣V￣)>
             socket.emit('messages/create', {
                 'chatId': chatId,
                 'data': data,
@@ -66,7 +66,7 @@ var path = require('path'),
     },
     stopPlaying = function(socket) {
         if(!isPlaying) {
-            var data = 'No video is playing now, silly goose -_-'
+            var data = 'OhOh~\nNo video is playing now\nsilly goose -_-'
             socket.emit('messages/create', {
                 'chatId': chatId,
                 'data': data,
@@ -84,10 +84,10 @@ var path = require('path'),
                 log('stdout: ' + stdout)
                 log('stderr: ' + stderr)
                 if(!err) {}})
-            var data = 'Ok, already stopped playing the video <(￣O￣)>'
+            var data = 'Ok! Already stopped playing the video\n<(￣O￣)>'
             socket.emit('messages/create', {
                 'chatId': chatId,
-                'data': cameraUrl,
+                'data': data,
                 'mime': 'text/plain',
                 'encoding': 'utf8',
                 'meta': { 'type': 'stream' }
