@@ -9,7 +9,8 @@ var path = require('path'),
     Errors = require('./lib/errors'),
     log = require('debug')(config.debug.tag + ':cmds'),
     takePhotoCmds = ['take a photo', 'take a picture'],
-    showVideoComds = ['play the video'],
+    startPlayingComds = ['play the video'],
+    stopPlayingComds = ['stop', 'stop playing'],
     isPlaying = false,
     sendPhoto = function(socket) {
 
@@ -50,7 +51,7 @@ var path = require('path'),
             var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
                 log('stdout: ' + stdout);log('stderr: ' + stderr);
                 if(!err) { debug(err) }})
-            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '. If you want to stop the video, just typing \'stop\' <(￣V￣)>'
+            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '. If you want to stop the video, just typing \'stop playing\' <(￣V￣)>'
             socket.emit('messages/create', {
                 'chatId': chatId,
                 'data': cameraUrl,
@@ -106,11 +107,18 @@ module.exports = {
                 'action': sendPhoto
             }
         }
-        for(var i = 0 , len = showVideoComds.length; i < len; i++) {
+        for(var i = 0 , len = startPlayingComds.length; i < len; i++) {
             str = str.toLowerCase()
-            if(str.indexOf(showVideoComds[i]) > -1) return {
-                'text': showVideoComds[i],
+            if(str.indexOf(startPlayingComds[i]) > -1) return {
+                'text': startPlayingComds[i],
                 'action': startPlaying
+            }
+        }
+        for(var i = 0 , len = stopPlayingComds.length; i < len; i++) {
+            str = str.toLowerCase()
+            if(str.indexOf(stopPlayingComds[i]) > -1) return {
+                'text': stopPlayingComds[i],
+                'action': stopPlaying
             }
         }
         return null
