@@ -1,4 +1,5 @@
 var _ = require('lodash'),
+    moment = require('moment'),
     commands = require('./commands'),
     config = require('./config'),
     Socket = config.socket,
@@ -18,5 +19,18 @@ var _ = require('lodash'),
                 var cmd = commands.get(msg)
                 if(cmd) { log('command is: ' + cmd.text); cmd.action(socket) }
             }
+        })
+
+        // webcome
+        var data = 'Good moring, Momo! My name is Pi Bot! So glad to see you!\n'
+        socket.emit('messages/create', {
+            'chatId': chatId,
+            'data': data,
+            'mime': 'text/plain',
+            'encoding': 'utf8',
+            'meta': { 'type': 'stream' }
+        }, function(data) {
+            if(data.code !== 200) log(Errors.SEND_FAILED)
+            log('sent successfully')
         })
     })
