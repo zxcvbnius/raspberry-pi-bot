@@ -16,8 +16,7 @@ var _ = require('lodash'),
             if(chat.id === message.chat.id && Pi.serial !== message.senderUser.serial) { // only handle message in chat
                 var msg = message.data
                 var cmd = commands.get(msg)
-                log('command is: ' + cmd.text)
-                if(cmd) { cmd.action(socket) }
+                if(cmd) { log('command is: ' + cmd.text); cmd.action(socket) }
             }
         })
     })
