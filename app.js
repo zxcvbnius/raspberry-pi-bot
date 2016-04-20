@@ -22,7 +22,7 @@ var _ = require('lodash'),
         })
 
         // webcome
-        var data = 'Good moring, Momo! My name is Pi Bot! So glad to see you!\n'
+        var data = 'Good moring, Momo! My name is Pi Bot! So glad to see you!'
         socket.emit('messages/create', {
             'chatId': chat.id,
             'data': data,
