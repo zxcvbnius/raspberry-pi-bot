@@ -11,24 +11,25 @@ var path = require('path'),
     Errors = require('./lib/errors'),
     request = require('superagent'),
     log = require('debug')(config.debug.tag + ':cmds'),
-    takePhotoCmds = ['take a photo', 'take a picture', 'take photo'],
     askTakingPhotoCmds = ['could you take a photo'],
+    takePhotoCmds = ['take a photo', 'take a picture', 'take photo', 'take picture'],
     startPlayingCmds = ['play the video', 'play video'],
     stopPlayingCmds = ['stop playing'],
     timeCmds = ['what time', 'time'],
     statusCmds = ['status'],
     helpCmds = ['help'],
-    startMotionCmd = ['start detecting', 'start detecting'],
-    stopMotionCmd = ['stop detecting', 'stop detecting'],
+    startMotionCmd = ['start motion detecting', 'start detecting', 'start motion detect'],
+    stopMotionCmd = ['stop motion detecting', 'stop detecting', 'stop motion detect'],
     isPlaying = false,
     isMotionDetecting = false,
-    sendCommand = function(socket, text) {
+    sendCommand = function(socket, text, meta) {
         return new Promise(function(resolve, reject) {
             socket.emit('messages/create', {
                 'chatId': chatId,
                 'data': text,
                 'mime': 'text/plain',
-                'encoding': 'utf8'
+                'encoding': 'utf8',
+                'meta': meta
             }, function(data) {
                 if(data.code !== 200) {reject(Errors.SEND_FAILED); log(Errors.SEND_FAILED);}
                 else {resolve(); }
@@ -38,7 +39,7 @@ var path = require('path'),
     showTime = function(socket) {
         var data = 'Today is ' + moment().format('YYYY/MM/DD') + '.\n'
         + 'Now is ' + moment().format('hh:mm:ss') + '. It\'s time for launch~~'
-        sendCommand(socket, data)
+        sendCommand(socket, data, meta.time)
     },
     takePhoto = function(socket) {
         return new Promise(function(resolve, reject) {
@@ -51,7 +52,8 @@ var path = require('path'),
                         'chatId': chatId,
                         'data': base64,
                         'mime': 'image/png',
-                        'encoding': 'base64'
+                        'encoding': 'base64',
+                        'meta': meta.image
                     }, function(data) {
                         if(data.code !== 200) {reject(Errors.SEND_FAILED); log(Errors.SEND_FAILED);}
                         else resolve()
@@ -61,9 +63,19 @@ var path = require('path'),
         })
     },
     sendPhoto = function(socket) {
-        if(isPlaying) {
+        if(isMotionDetecting) {
+            exec('sudo service motion stop', function(err, stdout, stderr) {})
+            sendCommand(socket, 'wait a minute ~', meta.info)
+            .then(function() {
+                sleep(3000)
+                return takePhoto(socket)
+            })
+            .then(function() {
+                exec('sudo service motion restart', function(err, stdout, stderr) {})
+            })
+        } else if(isPlaying) {
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {})
-            sendCommand(socket, 'wait a minute ~')
+            sendCommand(socket, 'wait a minute ~', meta.info)
             .then(function() {
                 sleep(3000)
                 return takePhoto(socket)
@@ -72,11 +84,12 @@ var path = require('path'),
                 var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {})
             })
         }else {
-            takePhoto(socket)
+            sendCommand(socket, 'OK! I will take a photo for you!', meta.info)
+            .then(function() {takePhoto(socket)})
         }
     },
     askTakingPhoto = function(socket) {
-        sendCommand(socket, 'of course! wait a minute ~')
+        sendCommand(socket, 'of course!', meta.info)
         .then(function() {
             sendPhoto(socket)
         })
@@ -85,42 +98,42 @@ var path = require('path'),
     startPlaying = function(socket) {
         if(isMotionDetecting) {
             var data = 'You should turn off detecting motion first'
-            sendCommand(socket, data)
+            sendCommand(socket, data, meta.alert)
         }
         else if(isPlaying) {
             var data = 'The video is playing, you can watch the video from ' + cameraUrl
-            sendCommand(socket, data)
+            sendCommand(socket, data, meta.info)
         }
         else {
             isPlaying = true
             var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
                 log('stdout: ' + stdout);log('stderr: ' + stderr); if(err) { log(err) }})
             var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop playing' //<(￣V￣)>
-            sendCommand(socket, data)
+            sendCommand(socket, data, meta.video)
         }
     },
     stopPlaying = function(socket) {
         if(!isPlaying) {
             var data = 'OhOh~\nNo video is playing now\nsilly goose -_-'
-            sendCommand(socket, data)
+            sendCommand(socket, data, meta.alert)
         }
         else {
             isPlaying = false
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {
                 log('stdout: ' + stdout); log('stderr: ' + stderr); if(!err) {}})
-            var data = 'Ok! Already stopped playing the video\n<(￣O￣)>'
-            sendCommand(socket, data)
+            var data = 'Ok! Stop playing the video\n<(￣O￣)>'
+            sendCommand(socket, data, meta.info)
         }
     },
     startMotion = function(socket) {
         isMotionDetecting = true
         if(!isPlaying) {
             exec('sudo service motion restart', function(err, stdout, stderr) {})
-            sendCommand(socket, 'Start detecting')
+            sendCommand(socket, 'Start detecting', meta.info)
         } else {
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {
                 log('stdout: ' + stdout); log('stderr: ' + stderr); if(!err) {}})
-            sendCommand(socket, 'wait a minute ~')
+            sendCommand(socket, 'wait a minute ~', meta.info)
             .then(function() {
                 sleep(3000)
                 exec('sudo service motion restart', function(err, stdout, stderr) {})
@@ -131,10 +144,10 @@ var path = require('path'),
     stopMotion = function(socket) {
         if(!isMotionDetecting) {
             var data = 'OhOh~\n I am not detecting now.\nsilly goose -_-'
-            sendCommand(socket, data)
+            sendCommand(socket, data, meta.alert)
         } else {
             exec('sudo service motion stop', function(err, stdout, stderr) {})
-            sendCommand(socket, 'Stop detecting! Wish you have a good day Momo!')
+            sendCommand(socket, 'Stop detecting! Wish you have a good day Ben!', meta.info)
         }
         isMotionDetecting = false
     },
@@ -147,7 +160,7 @@ KiB Swap:   102396 total,        0 used,   102396 free.   134300 cached Mem
 Filesystem:
 Size Used Avail Use%
 7.2G 2.9G 4.0G 42%`
-        sendCommand(socket, data)
+        sendCommand(socket, data, meta.status)
     },
     help = function(socket) {
         var data = `Here are my commands :
@@ -155,7 +168,7 @@ play the video: Typing this command will start playing the video,
 take a phto: Typing this command will take a photo for you,
 status: Typing status will display the current state of Pi,
 help: Typing help will display all available commands that Pi Bot can respond to.`
-        sendCommand(socket, data)
+        sendCommand(socket, data, meta.help)
     },
     sleep = function (sleepDuration ){
         var now = new Date().getTime();
@@ -166,7 +179,7 @@ help: Typing help will display all available commands that Pi Bot can respond to
             exec('netstat -na | grep 8081', function(err, stdout, stderr) {
                 if( !stdout || stdout === '') {
                     isMotionDetecting = false;
-                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + ' on ' + moment().format('DD/MM/YY'))
+                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + ' on ' + moment().format('DD/MM/YY'), meta.motion)
                     .then(function() { takePhoto(socket) })
                 }
                 else {sleep(2000); netstat();}
@@ -186,7 +199,17 @@ var cmds = [
     {c: statusCmds, a: status},
     {c: startMotionCmd, a: startMotion},
     {c: stopMotionCmd, a: stopMotion}
-]
+];
+var meta = {
+    time: {c: 0, t: 'time'}, // code , type
+    image: {c: 1, t: 'image'},
+    video: {c: 2, t: 'video'},
+    status:{c: 3, t: 'status'},
+    help:{c: 4, t: 'help'},
+    motion: {c: 5, t: 'motion'},
+    alert: {c: 6, t: 'alert'},
+    info: {c: 7, t: 'info'}
+}
 
 module.exports = {
     get: function(str) {
