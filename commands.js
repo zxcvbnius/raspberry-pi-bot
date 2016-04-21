@@ -187,14 +187,16 @@ var cmds = [
 
 module.exports = {
     get: function(str) {
-        str = str.toLowerCase()
-        cmds.forEach(function(cmd) {
-            log('------------' + cmd + '----------------')
-            cmd.c.forEach(function(c) {
-                log(c)
-                if(str.indexOf(c) > -1) { return { 'text': c, 'action': cmd.a } }
+        return new Promise(function(resolve, reject) {
+            str = str.toLowerCase()
+            cmds.forEach(function(cmd) {
+                cmd.c.forEach(function(c) {
+                    log(c)
+                    if(str.indexOf(c) > -1) { resolve({ 'text': c, 'action': cmd.a }) }
+                })
             })
+            log('===== FINISH ====')
+            reject()
         })
-        return null
     }
 }
