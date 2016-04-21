@@ -106,23 +106,25 @@ var path = require('path'),
         }
     },
     status = function(socket) {
-        var data = ''
+        var data = `CPU usage:
+%Cpu(s):  0.2 us,  0.2 sy,  0.0 ni, 99.5 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0
+KiB Mem:    882884 total,   232996 used,   649888 free,    18164 buffers
+KiB Swap:   102396 total,        0 used,   102396 free.   134300 cached Mem
+===============
+Filesystem:
+Size Used Avail Use%
+7.2G 2.9G 4.0G 42%`
+        sendCommand(socket, data)
+        /*
         exec('df -h', function(err, stdout, stderr) {
             data = stdout; log('stdout: ' + stdout);
             sendCommand(socket, data)
             .then(function() {
-                exec('top', function(err, stdout, stderr) {
-                    data += stdout;
-                    sendCommand(socket, data)
-                })
             })
             .catch(function() {
-                exec('top', function(err, stdout, stderr) {
-                    data = stdout;
-                    sendCommand(socket, data)
-                })
             })
         })
+        */
 
     },
     help = function(socket) {
