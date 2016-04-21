@@ -14,6 +14,8 @@ var path = require('path'),
     startPlayingCmds = ['play the video', 'play video'],
     stopPlayingCmds = ['stop', 'stop playing'],
     timeCmds = ['what time', 'time'],
+    statusCmds = ['status'],
+    helpCmds = ['help'],
     isPlaying = false,
     sendCommand = function(socket, text) {
         return new Promise(function(resolve, reject) {
@@ -103,6 +105,18 @@ var path = require('path'),
             sendCommand(socket, data)
         }
     },
+    status = function(socket) {
+
+    },
+    help = function(socket) {
+        var data = `Here are my commands :
+        play the video: Typing this command will start playing the video,\n
+        take a phto: Typing this command will take a photo for you,\n
+        status: Typing status will display the current state of Pi,\n
+        help: Typing help will display all available commands that Pi Bot can respond to.\n
+        `
+        sendCommand(socket, data)
+    },
     sleep = function (sleepDuration ){
         var now = new Date().getTime();
         while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
@@ -143,6 +157,13 @@ module.exports = {
             if(str.indexOf(timeCmds[i]) > -1) return {
                 'text': timeCmds[i],
                 'action': showTime
+            }
+        }
+        for(var i = 0 , len = helpCmds.length; i < len; i++) {
+            str = str.toLowerCase()
+            if(str.indexOf(helpCmds[i]) > -1) return {
+                'text': helpCmds[i],
+                'action': help
             }
         }
         return null
