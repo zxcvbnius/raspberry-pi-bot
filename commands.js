@@ -18,8 +18,8 @@ var path = require('path'),
     timeCmds = ['what time', 'time'],
     statusCmds = ['status'],
     helpCmds = ['help'],
-    startMotionCmd = ['start motion detecting', 'start detecting', 'start motion detect'],
-    stopMotionCmd = ['stop motion detecting', 'stop detecting', 'stop motion detect'],
+    startMotionCmd = ['start motion detecting', 'start detecting', 'start motion detect', 'start to detect', 'start detect'],
+    stopMotionCmd = ['stop motion detecting', 'stop detecting', 'stop motion detect', 'stop to detect', 'stop detect'],
     isPlaying = false,
     isMotionDetecting = false,
     sendCommand = function(socket, text, meta) {
@@ -178,9 +178,10 @@ help: Typing help will display all available commands that Pi Bot can respond to
         var netstat = function() {
             exec('netstat -na | grep 8081', function(err, stdout, stderr) {
                 if( !stdout || stdout === '') {
-                    isMotionDetecting = false;
-                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + ' on ' + moment().format('DD/MM/YY'), meta.motion)
-                    .then(function() { takePhoto(socket) })
+                    if(isMotionDetecting) {
+                        sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + ' on ' + moment().format('DD/MM/YY'), meta.motion)
+                        .then(function() { takePhoto(socket);isMotionDetecting = false; })
+                    }
                 }
                 else {sleep(2000); netstat();}
             })
