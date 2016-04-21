@@ -106,9 +106,17 @@ var path = require('path'),
         }
     },
     status = function(socket) {
-        var process = exec('df -h', function(err, stdout, stderr) {
-            log('stdout: ' + stdout); log('stderr: ' + stderr);
-            if(!err) {}})
+        var data = ''
+        exec('df -h', function(err, stdout, stderr) {
+            data = stdout; log('stdout: ' + stdout);
+            /*
+            exec('top', function(err, stdout, stderr) {
+                data += stdout;
+                sendCommand(data)
+            })
+            */
+            sendCommand(data)
+        })
 
     },
     help = function(socket) {
