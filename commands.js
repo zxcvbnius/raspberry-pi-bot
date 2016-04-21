@@ -11,7 +11,6 @@ var path = require('path'),
     Errors = require('./lib/errors'),
     request = require('superagent'),
     log = require('debug')(config.debug.tag + ':cmds'),
-
     takePhotoCmds = ['take a photo', 'take a picture', 'take photo'],
     askTakingPhotoCmds = ['could you take a photo'],
     startPlayingCmds = ['play the video', 'play video'],
@@ -21,7 +20,6 @@ var path = require('path'),
     helpCmds = ['help'],
     startMotionCmd = ['start detecting', 'start detecting'],
     stopMotionCmd = ['stop detecting', 'stop detecting'],
-
     isPlaying = false,
     isMotionDetecting = false,
     sendCommand = function(socket, text) {
@@ -150,17 +148,6 @@ Filesystem:
 Size Used Avail Use%
 7.2G 2.9G 4.0G 42%`
         sendCommand(socket, data)
-        /*
-        exec('df -h', function(err, stdout, stderr) {
-            data = stdout; log('stdout: ' + stdout);
-            sendCommand(socket, data)
-            .then(function() {
-            })
-            .catch(function() {
-            })
-        })
-        */
-
     },
     help = function(socket) {
         var data = `Here are my commands :
@@ -179,7 +166,7 @@ help: Typing help will display all available commands that Pi Bot can respond to
             exec('netstat -na | grep 8081', function(err, stdout, stderr) {
                 if( !stdout || stdout === '') {
                     isMotionDetecting = false;
-                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') +'on' + moment().format('DD/MM/YY'))
+                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + ' on ' + moment().format('DD/MM/YY'))
                     .then(function() { takePhoto(socket) })
                 }
                 else {sleep(2000); netstat();}
