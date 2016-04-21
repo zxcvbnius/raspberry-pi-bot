@@ -180,16 +180,17 @@ help: Typing help will display all available commands that Pi Bot can respond to
             request.get('http://127.0.0.1:8081')
             .end(function(err, res) {
                 if(err) {
+                    log('err : ' + err)
                     sendCommand(socket, 'Detect something...')
                     .then(function() {
                         sendPhoto(socket)
-                        break;
                     })
+                    isMotionDetecting = false
                 }
+                log('res: ' + res)
             })
             sleep(2000)
         }
-        isMotionDetecting = false
     };
 
 var cmds = [
