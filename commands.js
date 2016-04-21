@@ -109,13 +109,13 @@ var path = require('path'),
         var data = ''
         exec('df -h', function(err, stdout, stderr) {
             data = stdout; log('stdout: ' + stdout);
-            /*
-            exec('top', function(err, stdout, stderr) {
-                data += stdout;
-                sendCommand(data)
-            })
-            */
             sendCommand(socket, data)
+            .then(function() {
+                exec('top', function(err, stdout, stderr) {
+                    data += stdout;
+                    sendCommand(data)
+                })
+            })
         })
 
     },
