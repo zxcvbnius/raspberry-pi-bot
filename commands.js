@@ -14,12 +14,12 @@ var path = require('path'),
     takePhotoCmds = ['take a photo', 'take a picture', 'take photo'],
     askTakingPhotoCmds = ['could you take a photo'],
     startPlayingCmds = ['play the video', 'play video'],
-    stopPlayingCmds = ['stop', 'stop playing'],
+    stopPlayingCmds = ['stop playing'],
     timeCmds = ['what time', 'time'],
     statusCmds = ['status'],
     helpCmds = ['help'],
-    startMotionCmd = ['start motion detect', 'start detect motion'],
-    stopMotionCmd = ['stop motion detect', 'stop detect motion'],
+    startMotionCmd = ['start motion detecting', 'start to detect motion'],
+    stopMotionCmd = ['stop motion detecting', 'stop detecting motion'],
 
     isPlaying = false,
     isMotionDetecting = false,
@@ -96,7 +96,7 @@ var path = require('path'),
             isPlaying = true
             var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
                 log('stdout: ' + stdout);log('stderr: ' + stderr); if(err) { log(err) }})
-            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop' //<(￣V￣)>
+            var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop playing' //<(￣V￣)>
             sendCommand(socket, data)
         }
     },
@@ -191,11 +191,9 @@ module.exports = {
             str = str.toLowerCase()
             cmds.forEach(function(cmd) {
                 cmd.c.forEach(function(c) {
-                    log(c)
                     if(str.indexOf(c) > -1) { resolve({ 'text': c, 'action': cmd.a }) }
                 })
             })
-            log('===== FINISH ====')
             reject()
         })
     }
