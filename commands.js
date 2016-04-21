@@ -58,6 +58,7 @@ var path = require('path'),
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {})
             sendCommand(socket, 'wait a minute ~')
             .then(function() {
+                sleep(3000)
                 return takePhoto(socket)
             })
             .then(function() {
@@ -101,6 +102,10 @@ var path = require('path'),
             var data = 'Ok! Already stopped playing the video\n<(￣O￣)>'
             sendCommand(socket, data)
         }
+    },
+    sleep = function (sleepDuration ){
+        var now = new Date().getTime();
+        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
     };
 
 module.exports = {
