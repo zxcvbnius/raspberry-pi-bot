@@ -177,17 +177,13 @@ help: Typing help will display all available commands that Pi Bot can respond to
     motionListener = function(socket) {
         while(isMotionDetecting) {
             log('===== MotionListener =====')
-            request.get('http://127.0.0.1:8081')
-            .end(function(err, res) {
-                if(err) {
-                    log('err : ' + err)
-                    sendCommand(socket, 'Detect something...')
-                    .then(function() {
-                        sendPhoto(socket)
-                    })
+            exec('netstat -na | grep 8081', function(err, stdout, stderr) {
+                log(err)
+                log(stdout)
+                log(stderr)
+                if( !stdout || stdout === '') {
                     isMotionDetecting = false
                 }
-                log('res: ' + res)
             })
             sleep(2000)
         }
