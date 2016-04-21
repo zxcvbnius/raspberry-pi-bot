@@ -113,13 +113,13 @@ var path = require('path'),
             .then(function() {
                 exec('top', function(err, stdout, stderr) {
                     data += stdout;
-                    sendCommand(data)
+                    sendCommand(socket, data)
                 })
             })
             .catch(function() {
                 exec('top', function(err, stdout, stderr) {
-                    data += stdout;
-                    sendCommand(data)
+                    data = stdout;
+                    sendCommand(socket, data)
                 })
             })
         })
