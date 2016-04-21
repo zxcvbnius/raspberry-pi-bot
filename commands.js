@@ -179,7 +179,7 @@ help: Typing help will display all available commands that Pi Bot can respond to
             exec('netstat -na | grep 8081', function(err, stdout, stderr) {
                 if( !stdout || stdout === '') {
                     isMotionDetecting = false;
-                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + on + moment().format('DD/MM/YY'))
+                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') +'on' + moment().format('DD/MM/YY'))
                     .then(function() { takePhoto(socket) })
                 }
                 else {sleep(2000); netstat();}
