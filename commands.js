@@ -177,11 +177,15 @@ help: Typing help will display all available commands that Pi Bot can respond to
     motionListener = function(socket) {
         var netstat = function() {
             exec('netstat -na | grep 8081', function(err, stdout, stderr) {
-                log(stderr)
-                if( !stdout || stdout === '') { isMotionDetecting = false; }
+                if( !stdout || stdout === '') {
+                    isMotionDetecting = false;
+                    sendCommand(socket, 'Take a look. Your webcam noticed motion at ' + moment().format('hh:mm') + on + moment().format('DD/MM/YY'))
+                    .then(function() { takePhoto(socket) })
+                }
                 else {sleep(2000); netstat();}
             })
         }
+        sleep(2000)
         netstat()
     };
 
