@@ -175,18 +175,11 @@ help: Typing help will display all available commands that Pi Bot can respond to
         while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
     },
     motionListener = function(socket) {
-        while(isMotionDetecting) {
-            log('===== MotionListener =====')
-            exec('netstat -na | grep 8081', function(err, stdout, stderr) {
-                log(err)
-                log(stdout)
-                log(stderr)
-                if( !stdout || stdout === '') {
-                    isMotionDetecting = false
-                }
-            })
-            sleep(2000)
-        }
+        exec('netstat -na | grep 8081', function(err, stdout, stderr) {
+            log('this :' + this)
+            log(stderr)
+            if( !stdout || stdout === '') { isMotionDetecting = false }
+        })
     };
 
 var cmds = [
