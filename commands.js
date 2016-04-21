@@ -33,31 +33,12 @@ var path = require('path'),
         + 'Now is ' + moment().format('hh:mm:ss') + '. It\'s time for launch~~'
         sendCommand(socket, data)
     },
-    sendPhoto = function(socket) {
-        var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
-        var process = exec('fswebcam -p YUYV -d /dev/video0 -r 640x480 ' + photoPath, function(err, stdout, stderr) {
-            log('stdout: ' + stdout); log('stderr: ' + stderr);
-            if(!err) {
-                var base64 = Utils.toDataString(photoPath)
-                socket.emit('messages/create', {
-                    'chatId': chatId,
-                    'data': base64,
-                    'mime': 'image/png',
-                    'encoding': 'base64'
-                }, function(data) {
-                    if(data.code !== 200) log(Errors.SEND_FAILED)
-                })
-            }
-        })
-    },
-    askTakingPhoto = function(socket) {
-        sendCommand(socket, 'of course! wait a minute ~')
-        .then(function() {
+    takePhoto = function(socket) {
+        return new Promise(function(resolve, reject) {
             var photoPath = path.resolve(__dirname, 'camera/' + moment().format('YYYY-MM-DD-hhmmss') + '.jpg')
             var process = exec('fswebcam -p YUYV -d /dev/video0 -r 640x480 ' + photoPath, function(err, stdout, stderr) {
                 log('stdout: ' + stdout); log('stderr: ' + stderr);
                 if(!err) {
-
                     var base64 = Utils.toDataString(photoPath)
                     socket.emit('messages/create', {
                         'chatId': chatId,
@@ -65,10 +46,31 @@ var path = require('path'),
                         'mime': 'image/png',
                         'encoding': 'base64'
                     }, function(data) {
-                        if(data.code !== 200) log(Errors.SEND_FAILED)
+                        if(data.code !== 200) {reject(Errors.SEND_FAILED); log(Errors.SEND_FAILED);}
+                        else resolve()
                     })
                 }
             })
+        })
+    }
+    sendPhoto = function(socket) {
+        if(isPlaying) {
+            var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {})
+            sendCommand(socket, 'wait a minute ~')
+            .then(function() {
+                return takePhoto(socket)
+            })
+            .then(function() {
+                var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {})
+            })
+        }else {
+            takePhoto(socket)
+        }
+    },
+    askTakingPhoto = function(socket) {
+        sendCommand(socket, 'of course! wait a minute ~')
+        .then(function() {
+            sendPhoto(socket)
         })
         .catch(function(err) {})
     },
