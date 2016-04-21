@@ -9,6 +9,7 @@ var path = require('path'),
     cameraUrl = config.camera.baseUrl,
     Utils = require('./lib/Utils'),
     Errors = require('./lib/errors'),
+    request = require('superagent'),
     log = require('debug')(config.debug.tag + ':cmds'),
 
     takePhotoCmds = ['take a photo', 'take a picture', 'take photo'],
@@ -127,6 +128,7 @@ var path = require('path'),
                 exec('sudo service motion restart', function(err, stdout, stderr) {})
             })
         }
+        motionListener(socket)
     },
     stopMotion = function(socket) {
         if(!isMotionDetecting) {
@@ -171,6 +173,23 @@ help: Typing help will display all available commands that Pi Bot can respond to
     sleep = function (sleepDuration ){
         var now = new Date().getTime();
         while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
+    },
+    motionListener = function(socket) {
+        while(isMotionDetecting) {
+            log('===== MotionListener =====')
+            request.get('http://127.0.0.1:8081')
+            .end(function(err, res) {
+                if(err) {
+                    sendCommand(socket, 'Detect something...')
+                    .then(function() {
+                        sendPhoto(socket)
+                        break;
+                    })
+                }
+            })
+            sleep(2000)
+        }
+        isMotionDetecting = false
     };
 
 var cmds = [
