@@ -110,10 +110,10 @@ var path = require('path'),
     },
     help = function(socket) {
         var data = `Here are my commands :
-        play the video: Typing this command will start playing the video,
-        take a phto: Typing this command will take a photo for you,
-        status: Typing status will display the current state of Pi,
-        help: Typing help will display all available commands that Pi Bot can respond to.`
+play the video: Typing this command will start playing the video,
+take a phto: Typing this command will take a photo for you,
+status: Typing status will display the current state of Pi,
+help: Typing help will display all available commands that Pi Bot can respond to.`
         sendCommand(socket, data)
     },
     sleep = function (sleepDuration ){
