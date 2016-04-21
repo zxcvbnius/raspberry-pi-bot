@@ -116,6 +116,12 @@ var path = require('path'),
                     sendCommand(data)
                 })
             })
+            .catch(function() {
+                exec('top', function(err, stdout, stderr) {
+                    data += stdout;
+                    sendCommand(data)
+                })
+            })
         })
 
     },
