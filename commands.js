@@ -189,7 +189,11 @@ module.exports = {
     get: function(str) {
         str = str.toLowerCase()
         cmds.forEach(function(cmd) {
-            if(str.indexOf(cmd.c) > -1) { return { 'text': cmd.c, 'action': cmd.a } }
+            log('------------' + cmd + '----------------')
+            cmd.c.forEach(function(c) {
+                log(c)
+                if(str.indexOf(c) > -1) { return { 'text': c, 'action': cmd.a } }
+            })
         })
         return null
     }
