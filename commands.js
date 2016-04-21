@@ -54,7 +54,7 @@ var path = require('path'),
                 }
             })
         })
-    }
+    },
     sendPhoto = function(socket) {
         if(isPlaying) {
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {})
@@ -109,12 +109,13 @@ var path = require('path'),
 
     },
     help = function(socket) {
-        var data = `Here are my commands :
+        var data = `Here are my commands :\n
         play the video: Typing this command will start playing the video,\n
         take a phto: Typing this command will take a photo for you,\n
         status: Typing status will display the current state of Pi,\n
         help: Typing help will display all available commands that Pi Bot can respond to.\n
         `
+        log(data)
         sendCommand(socket, data)
     },
     sleep = function (sleepDuration ){
