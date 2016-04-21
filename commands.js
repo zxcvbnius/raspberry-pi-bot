@@ -106,6 +106,9 @@ var path = require('path'),
         }
     },
     status = function(socket) {
+        var process = exec('df -h', function(err, stdout, stderr) {
+            log('stdout: ' + stdout); log('stderr: ' + stderr);
+            if(!err) {}})
 
     },
     help = function(socket) {
