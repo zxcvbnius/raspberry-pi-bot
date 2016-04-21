@@ -115,7 +115,7 @@ var path = require('path'),
                 sendCommand(data)
             })
             */
-            sendCommand(data)
+            sendCommand(socket, data)
         })
 
     },
