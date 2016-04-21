@@ -9,10 +9,7 @@ var _ = require('lodash'),
     log = require('debug')(config.debug.tag + ':app');
 
     socket.emit('authenticate', {'authToken': Pi.authToken}, function(data) {
-        if(data.code !== 200) {
-            log('authentication error')
-        }
-
+        if(data.code !== 200) { log('authentication error') }
         socket.on('message', function(message) {
             if(chat.id === message.chat.id && Pi.serial !== message.senderUser.serial) { // only handle message in chat
                 var msg = message.data

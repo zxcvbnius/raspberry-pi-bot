@@ -2,6 +2,7 @@ var path = require('path'),
     fs = require('fs'),
     exec = require('child_process').exec,
     moment = require('moment'),
+    _ = require('lodash'),
     Promise = require('bluebird'),
     config = require('./config'),
     chatId = config.chat.id,
@@ -9,6 +10,7 @@ var path = require('path'),
     Utils = require('./lib/Utils'),
     Errors = require('./lib/errors'),
     log = require('debug')(config.debug.tag + ':cmds'),
+
     takePhotoCmds = ['take a photo', 'take a picture', 'take photo'],
     askTakingPhotoCmds = ['could you take a photo'],
     startPlayingCmds = ['play the video', 'play video'],
@@ -16,7 +18,11 @@ var path = require('path'),
     timeCmds = ['what time', 'time'],
     statusCmds = ['status'],
     helpCmds = ['help'],
+    startMotionCmd = ['start motion detect', 'start detect motion'],
+    stopMotionCmd = ['stop motion detect', 'stop detect motion'],
+
     isPlaying = false,
+    isMotionDetecting = false,
     sendCommand = function(socket, text) {
         return new Promise(function(resolve, reject) {
             socket.emit('messages/create', {
@@ -78,15 +84,18 @@ var path = require('path'),
         .catch(function(err) {})
     },
     startPlaying = function(socket) {
-        if(isPlaying) {
+        if(isMotionDetecting) {
+            var data = 'You should turn off detecting motion first'
+            sendCommand(socket, data)
+        }
+        else if(isPlaying) {
             var data = 'The video is playing, you can watch the video from ' + cameraUrl
             sendCommand(socket, data)
         }
         else {
             isPlaying = true
             var process = exec('mjpg-streamer/mjpg-streamer.sh start', function(err, stdout, stderr) {
-                log('stdout: ' + stdout);log('stderr: ' + stderr);
-                if(err) { log(err) }})
+                log('stdout: ' + stdout);log('stderr: ' + stderr); if(err) { log(err) }})
             var data = 'Now is' + moment().format('YYYY-MM-DD-hh:mm:ss') + '.\nIf you want to stop the video, just typing stop' //<(￣V￣)>
             sendCommand(socket, data)
         }
@@ -99,11 +108,35 @@ var path = require('path'),
         else {
             isPlaying = false
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {
-                log('stdout: ' + stdout); log('stderr: ' + stderr);
-                if(!err) {}})
+                log('stdout: ' + stdout); log('stderr: ' + stderr); if(!err) {}})
             var data = 'Ok! Already stopped playing the video\n<(￣O￣)>'
             sendCommand(socket, data)
         }
+    },
+    startMotion = function(socket) {
+        isMotionDetecting = true
+        if(!isPlaying) {
+            exec('sudo service motion restart', function(err, stdout, stderr) {})
+            sendCommand(socket, 'Start detecting')
+        } else {
+            var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {
+                log('stdout: ' + stdout); log('stderr: ' + stderr); if(!err) {}})
+            sendCommand(socket, 'wait a minute ~')
+            .then(function() {
+                sleep(3000)
+                exec('sudo service motion restart', function(err, stdout, stderr) {})
+            })
+        }
+    },
+    stopMotion = function(socket) {
+        if(!isMotionDetecting) {
+            var data = 'OhOh~\n I am not detecting now.\nsilly goose -_-'
+            sendCommand(socket, data)
+        } else {
+            exec('sudo service motion stop', function(err, stdout, stderr) {})
+            sendCommand(socket, 'Stop detecting! Wish you have a good day Momo!')
+        }
+        isMotionDetecting = false
     },
     status = function(socket) {
         var data = `CPU usage:
@@ -140,57 +173,24 @@ help: Typing help will display all available commands that Pi Bot can respond to
         while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
     };
 
+var cmds = [
+    {c: askTakingPhotoCmds, a: askTakingPhoto},
+    {c: takePhotoCmds, a: sendPhoto},
+    {c: startPlayingCmds, a: startPlaying},
+    {c: stopPlayingCmds, a: stopPlaying},
+    {c: timeCmds, a: showTime},
+    {c: helpCmds, a: help},
+    {c: statusCmds, a: status},
+    {c: startMotionCmd, a: startMotion},
+    {c: stopMotionCmd, a: stopMotion}
+]
+
 module.exports = {
     get: function(str) {
         str = str.toLowerCase()
-        askTakingPhotoCmds
-        for(var i = 0 , len = askTakingPhotoCmds.length; i < len; i++) {
-            if(str.indexOf(askTakingPhotoCmds[i]) > -1) return {
-                'text': askTakingPhotoCmds[i],
-                'action': askTakingPhoto
-            }
-        }
-        for(var i = 0 , len = takePhotoCmds.length; i < len; i++) {
-            if(str.indexOf(takePhotoCmds[i]) > -1) return {
-                'text': takePhotoCmds[i],
-                'action': sendPhoto
-            }
-        }
-        for(var i = 0 , len = startPlayingCmds.length; i < len; i++) {
-            str = str.toLowerCase()
-            if(str.indexOf(startPlayingCmds[i]) > -1) return {
-                'text': startPlayingCmds[i],
-                'action': startPlaying
-            }
-        }
-        for(var i = 0 , len = stopPlayingCmds.length; i < len; i++) {
-            str = str.toLowerCase()
-            if(str.indexOf(stopPlayingCmds[i]) > -1) return {
-                'text': stopPlayingCmds[i],
-                'action': stopPlaying
-            }
-        }
-        for(var i = 0 , len = timeCmds.length; i < len; i++) {
-            str = str.toLowerCase()
-            if(str.indexOf(timeCmds[i]) > -1) return {
-                'text': timeCmds[i],
-                'action': showTime
-            }
-        }
-        for(var i = 0 , len = helpCmds.length; i < len; i++) {
-            str = str.toLowerCase()
-            if(str.indexOf(helpCmds[i]) > -1) return {
-                'text': helpCmds[i],
-                'action': help
-            }
-        }
-        for(var i = 0 , len = statusCmds.length; i < len; i++) {
-            str = str.toLowerCase()
-            if(str.indexOf(statusCmds[i]) > -1) return {
-                'text': statusCmds[i],
-                'action': status
-            }
-        }
+        cmds.forEach(function(cmd) {
+            if(str.indexOf(cmd.c) > -1) { return { 'text': cmd.c, 'action': cmd.a } }
+        })
         return null
     }
 }
