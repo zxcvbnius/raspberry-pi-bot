@@ -168,6 +168,13 @@ module.exports = {
                 'action': help
             }
         }
+        for(var i = 0 , len = statusCmds.length; i < len; i++) {
+            str = str.toLowerCase()
+            if(str.indexOf(statusCmds[i]) > -1) return {
+                'text': statusCmds[i],
+                'action': status
+            }
+        }
         return null
     }
 }
