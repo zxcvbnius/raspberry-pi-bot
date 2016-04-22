@@ -133,7 +133,7 @@ var path = require('path'),
         } else {
             var process = exec('mjpg-streamer/mjpg-streamer.sh stop', function(err, stdout, stderr) {
                 log('stdout: ' + stdout); log('stderr: ' + stderr); if(!err) {}})
-            sendCommand(socket, 'wait a minute ~', meta.info)
+            sendCommand(socket, 'start detecting motion', meta.info)
             .then(function() {
                 sleep(3000)
                 exec('sudo service motion restart', function(err, stdout, stderr) {})
