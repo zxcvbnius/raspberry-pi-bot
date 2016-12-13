@@ -1,7 +1,7 @@
 # raspberry-pi-bot
 
 This is a demo project for NCTU class. Showing students how to control Raspberry pi by using Android devices. 
-[Demo App](https://drive.google.com/open?id=0B_P53ILf1tA1ZjVOaVp3cHVQdDQ)
+[Demo](https://drive.google.com/open?id=0B_P53ILf1tA1ZjVOaVp3cHVQdDQ)
 
 
 ## Socket.io
