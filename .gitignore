@@ -1,9 +1,28 @@
 # OS X
 .DS_Store*
+Icon?
 ._*
 
-# Config
-config.js
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*~
+
+# Editor
+*.swp
+
+# npm
+node_modules
+*.log
+*.gz
+CHANGELOG.md
+
+# IDE
+.idea/
 
 # Coveralls
 coverage
@@ -12,4 +31,10 @@ coverage
 benchmarks/graphs
 
 # Auto Generated files
+docs/
+
+# Gulp
+build/
+
+# Document
 docs/
